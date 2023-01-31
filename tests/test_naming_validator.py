@@ -2,6 +2,8 @@
 
 import pytest
 
+pytest.importorskip("networkx", reason="networkx indisponivel (falta _bz2)")
+
 from dbt_parser.analyzers.graph_resolver import GraphResolver, NodeInfo
 from dbt_parser.validators.naming_validator import NamingValidator, NamingConvention
 from dbt_parser.validators.model_validator import Severity

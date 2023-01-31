@@ -2,6 +2,8 @@
 
 import pytest
 
+pytest.importorskip("networkx", reason="networkx indisponivel (falta _bz2)")
+
 from dbt_parser.analyzers.graph_resolver import GraphResolver, NodeInfo
 from dbt_parser.analyzers.lineage_tracker import LineageTracker, LineageEntry
 

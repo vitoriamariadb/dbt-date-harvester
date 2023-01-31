@@ -3,6 +3,8 @@
 import pytest
 from pathlib import Path
 
+pytest.importorskip("networkx", reason="networkx indisponivel (falta _bz2)")
+
 from dbt_parser.parsers.sql_parser import SqlParser
 from dbt_parser.analyzers.graph_resolver import GraphResolver, NodeInfo
 from dbt_parser.analyzers.complexity_metrics import ComplexityMetrics, ModelComplexity

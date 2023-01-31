@@ -4,6 +4,8 @@ import pytest
 import yaml
 from pathlib import Path
 
+pytest.importorskip("networkx", reason="networkx indisponivel (falta _bz2)")
+
 from dbt_parser.parsers.yaml_parser import YamlParser
 from dbt_parser.parsers.sql_parser import SqlParser
 from dbt_parser.parsers.schema_extractor import SchemaExtractor

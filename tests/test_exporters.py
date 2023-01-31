@@ -4,6 +4,8 @@ import json
 import pytest
 from pathlib import Path
 
+pytest.importorskip("networkx", reason="networkx indisponivel (falta _bz2)")
+
 from dbt_parser.analyzers.graph_resolver import GraphResolver, NodeInfo
 from dbt_parser.exporters.json_exporter import JsonExporter
 from dbt_parser.exporters.graphviz_exporter import GraphvizExporter

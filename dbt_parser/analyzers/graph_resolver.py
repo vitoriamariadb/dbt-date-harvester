@@ -1,12 +1,27 @@
 """Resolver de grafos de dependencia para projetos dbt."""
 
+from __future__ import annotations
+
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple
 
-import networkx as nx
+if TYPE_CHECKING:
+    import networkx as nx
 
 logger = logging.getLogger(__name__)
+
+
+def _import_networkx():
+    """Importa networkx sob demanda para evitar falha em ambientes sem _bz2."""
+    try:
+        import networkx as nx
+        return nx
+    except ImportError as exc:
+        raise ImportError(
+            "networkx e necessario para funcionalidades de grafo. "
+            "Instale com: pip install networkx"
+        ) from exc
 
 
 @dataclass
@@ -24,6 +39,7 @@ class GraphResolver:
     """Constroi e resolve grafos de dependencia de projetos dbt."""
 
     def __init__(self) -> None:
+        nx = _import_networkx()
         self.graph: nx.DiGraph = nx.DiGraph()
         self._nodes: Dict[str, NodeInfo] = {}
 
@@ -57,18 +73,21 @@ class GraphResolver:
 
     def get_all_upstream(self, node_name: str) -> Set[str]:
         """Retorna todas as dependencias transitivas (upstream)."""
+        nx = _import_networkx()
         if node_name not in self.graph:
             return set()
         return set(nx.descendants(self.graph, node_name))
 
     def get_all_downstream(self, node_name: str) -> Set[str]:
         """Retorna todos os dependentes transitivos (downstream)."""
+        nx = _import_networkx()
         if node_name not in self.graph:
             return set()
         return set(nx.ancestors(self.graph, node_name))
 
     def topological_sort(self) -> List[str]:
         """Retorna ordem topologica de execucao."""
+        nx = _import_networkx()
         try:
             return list(reversed(list(nx.topological_sort(self.graph))))
         except nx.NetworkXUnfeasible:
@@ -77,6 +96,7 @@ class GraphResolver:
 
     def detect_cycles(self) -> List[List[str]]:
         """Detecta ciclos no grafo."""
+        nx = _import_networkx()
         try:
             cycles = list(nx.simple_cycles(self.graph))
             if cycles:

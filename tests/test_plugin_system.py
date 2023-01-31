@@ -5,6 +5,7 @@ from pathlib import Path
 
 from dbt_parser.plugins.plugin_manager import PluginManager, BasePlugin
 from dbt_parser.analyzers.graph_resolver import GraphResolver
+from tests.conftest import requires_networkx
 
 
 class SamplePlugin(BasePlugin):
@@ -59,6 +60,7 @@ class TestPluginManager:
         assert manager.unregister("sample-plugin")
         assert manager.get_plugin("sample-plugin") is None
 
+    @requires_networkx
     def test_emit_event(self) -> None:
         manager = PluginManager()
         manager.register(SamplePlugin)
@@ -67,6 +69,7 @@ class TestPluginManager:
         plugin = manager.get_plugin("sample-plugin")
         assert len(plugin.parse_events) == 1
 
+    @requires_networkx
     def test_disable_plugin(self) -> None:
         manager = PluginManager()
         manager.register(SamplePlugin)
