@@ -128,3 +128,4 @@ class DependencyAnalyzer:
             ):
                 isolated.add(node)
         return isolated
+
