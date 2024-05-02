@@ -126,3 +126,4 @@ class DuplicateFinder:
             "similar_model_groups": len(similar),
             "duplicate_config_groups": len(dup_configs),
         }
+
