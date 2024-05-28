@@ -130,3 +130,4 @@ class GraphResolver:
             if name in self._nodes:
                 sub._nodes[name] = self._nodes[name]
         return sub
+
