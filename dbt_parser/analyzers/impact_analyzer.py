@@ -127,3 +127,4 @@ class ImpactAnalyzer:
             ),
             "critical_nodes": [n for n, c in impacts if c >= self.RISK_THRESHOLDS["high"]],
         }
+
