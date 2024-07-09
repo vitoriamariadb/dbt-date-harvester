@@ -127,3 +127,4 @@ class RefResolver:
     def get_models_with_broken_refs(self) -> set[str]:
         """Retorna modelos com referencias quebradas."""
         return {r.source_model for r in self._unresolved_refs}
+
