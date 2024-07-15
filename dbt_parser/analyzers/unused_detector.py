@@ -105,3 +105,4 @@ class UnusedDetector:
 
         logger.info("Relatorio de nao utilizados: %d itens", total)
         return report
+
