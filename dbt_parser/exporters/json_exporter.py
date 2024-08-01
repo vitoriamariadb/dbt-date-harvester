@@ -87,3 +87,4 @@ class JsonExporter:
         if validation_summary:
             summary["validation"] = validation_summary
         return summary
+
