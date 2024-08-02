@@ -110,3 +110,4 @@ class MermaidExporter:
     def _safe_id(name: str) -> str:
         """Converte nome para ID seguro para Mermaid."""
         return name.replace(".", "_").replace("-", "_")
+
