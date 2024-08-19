@@ -125,3 +125,4 @@ class JinjaParser:
             "if_blocks": len(self.IF_PATTERN.findall(content)),
             "for_loops": len(self.FOR_PATTERN.findall(content)),
         }
+
