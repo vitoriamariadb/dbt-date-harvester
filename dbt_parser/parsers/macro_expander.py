@@ -127,3 +127,4 @@ class MacroExpander:
                 by_file[key] = []
             by_file[key].append(macro.name)
         return by_file
+
