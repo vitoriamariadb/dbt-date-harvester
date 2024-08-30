@@ -116,3 +116,4 @@ class SchemaExtractor:
         if not model:
             return {}
         return {col.name: col.tests for col in model.columns if col.tests}
+
