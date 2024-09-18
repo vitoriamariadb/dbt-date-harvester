@@ -124,3 +124,4 @@ class SourceParser:
                     key = f"{source.name}.{table.name}"
                     freshness[key] = table.freshness
         return freshness
+
