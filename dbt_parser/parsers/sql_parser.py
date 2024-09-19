@@ -140,3 +140,4 @@ class SqlParser:
     def get_all_sources(self) -> dict[str, list[tuple[str, str]]]:
         """Retorna mapa de sources por modelo."""
         return {name: model.sources for name, model in self._parsed_models.items()}
+
