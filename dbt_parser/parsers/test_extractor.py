@@ -127,3 +127,4 @@ class TestExtractor:
             "data": sum(1 for t in self._tests if t.test_type == "data"),
             "custom": sum(1 for t in self._tests if t.test_type == "custom"),
         }
+
