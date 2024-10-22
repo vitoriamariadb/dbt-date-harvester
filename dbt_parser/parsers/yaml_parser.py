@@ -69,3 +69,4 @@ class YamlParser:
     def extract_sources_section(self, content: dict[str, Any]) -> list[dict[str, Any]]:
         """Extrai secao de sources de um sources.yml."""
         return content.get("sources", [])
+
