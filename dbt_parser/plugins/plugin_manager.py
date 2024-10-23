@@ -178,3 +178,4 @@ class PluginManager:
                 for p in self._plugins.values()
             ],
         }
+
