@@ -126,3 +126,4 @@ class ResultCache:
             return None
         content = filepath.read_bytes()
         return hashlib.md5(content).hexdigest()
+
