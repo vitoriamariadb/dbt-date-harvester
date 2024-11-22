@@ -135,3 +135,4 @@ class ModelFilter:
         for criteria in criteria_list[1:]:
             result &= self.apply_filter(criteria)
         return result
+
