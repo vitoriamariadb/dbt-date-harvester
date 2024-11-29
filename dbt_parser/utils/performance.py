@@ -88,3 +88,4 @@ def batch_process(items: list, batch_size: int, processor: Callable) -> list[Any
         batch_results = [processor(item) for item in batch]
         results.extend(batch_results)
     return results
+
