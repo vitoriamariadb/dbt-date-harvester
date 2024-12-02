@@ -118,3 +118,4 @@ class FuzzySearch:
         """Reconstroi indice de busca."""
         self._index.clear()
         self._build_index()
+
