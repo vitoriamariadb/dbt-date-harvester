@@ -5,13 +5,12 @@ import logging
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 from dbt_parser.analyzers.dependency_analyzer import DependencyReport
 
 logger = logging.getLogger(__name__)
-
 
 class DataclassEncoder(json.JSONEncoder):
     """Encoder JSON para dataclasses e tipos especiais."""
@@ -27,22 +26,21 @@ class DataclassEncoder(json.JSONEncoder):
             return obj.isoformat()
         return super().default(obj)
 
-
 class JsonExporter:
     """Exporta dados de analise dbt para JSON."""
 
     def __init__(self, indent: int = 2) -> None:
         self.indent = indent
 
-    def export_graph(self, graph: GraphResolver) -> Dict[str, Any]:
+    def export_graph(self, graph: GraphResolver) -> dict[str, Any]:
         """Exporta grafo de dependencias para estrutura JSON."""
-        nodes: List[Dict[str, Any]] = []
+        nodes: list[dict[str, Any]] = []
         for name in graph.graph.nodes():
             node_data = dict(graph.graph.nodes[name])
             node_data["name"] = name
             nodes.append(node_data)
 
-        edges: List[Dict[str, str]] = []
+        edges: list[dict[str, str]] = []
         for from_node, to_node in graph.graph.edges():
             edges.append({"from": from_node, "to": to_node})
 
@@ -59,8 +57,8 @@ class JsonExporter:
         }
 
     def export_dependency_reports(
-        self, reports: List[DependencyReport]
-    ) -> List[Dict[str, Any]]:
+        self, reports: list[DependencyReport]
+    ) -> list[dict[str, Any]]:
         """Exporta relatorios de dependencia para JSON."""
         return [asdict(r) for r in reports]
 
@@ -78,11 +76,11 @@ class JsonExporter:
     def export_project_summary(
         self,
         graph: GraphResolver,
-        reports: List[DependencyReport],
-        validation_summary: Optional[Dict[str, int]] = None,
-    ) -> Dict[str, Any]:
+        reports: list[DependencyReport],
+        validation_summary: dict[str, int | None] = None,
+    ) -> dict[str, Any]:
         """Exporta resumo completo do projeto."""
-        summary: Dict[str, Any] = {
+        summary: dict[str, Any] = {
             "graph": self.export_graph(graph),
             "dependency_reports": self.export_dependency_reports(reports),
         }

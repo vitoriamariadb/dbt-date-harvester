@@ -3,13 +3,12 @@
 import logging
 import re
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from dbt_parser.parsers.sql_parser import SqlParser, SqlModelInfo
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class ModelComplexity:
@@ -26,7 +25,6 @@ class ModelComplexity:
     dependency_depth: int = 0
     dependents_count: int = 0
     complexity_score: float = 0.0
-
 
 class ComplexityMetrics:
     """Calcula metricas de complexidade para modelos dbt."""
@@ -81,9 +79,9 @@ class ComplexityMetrics:
         complexity.complexity_score = self._calculate_score(complexity)
         return complexity
 
-    def calculate_all(self) -> List[ModelComplexity]:
+    def calculate_all(self) -> list[ModelComplexity]:
         """Calcula complexidade de todos os modelos."""
-        results: List[ModelComplexity] = []
+        results: list[ModelComplexity] = []
         for name in self.sql_parser._parsed_models:
             results.append(self.calculate_model_complexity(name))
         results.sort(key=lambda m: m.complexity_score, reverse=True)
@@ -103,11 +101,11 @@ class ComplexityMetrics:
         score += metrics.dependents_count * self.WEIGHTS["dependents_count"]
         return round(score, 2)
 
-    def get_most_complex(self, top_n: int = 10) -> List[ModelComplexity]:
+    def get_most_complex(self, top_n: int = 10) -> list[ModelComplexity]:
         """Retorna modelos mais complexos."""
         return self.calculate_all()[:top_n]
 
-    def get_complexity_summary(self) -> Dict[str, Any]:
+    def get_complexity_summary(self) -> dict[str, Any]:
         """Retorna resumo de complexidade do projeto."""
         all_metrics = self.calculate_all()
         if not all_metrics:

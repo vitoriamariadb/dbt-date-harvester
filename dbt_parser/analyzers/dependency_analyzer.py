@@ -2,27 +2,25 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 from dbt_parser.parsers.sql_parser import SqlParser
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class DependencyReport:
     """Relatorio de dependencias de um modelo."""
 
     model_name: str
-    direct_dependencies: List[str] = field(default_factory=list)
-    transitive_dependencies: List[str] = field(default_factory=list)
-    direct_dependents: List[str] = field(default_factory=list)
-    transitive_dependents: List[str] = field(default_factory=list)
+    direct_dependencies: list[str] = field(default_factory=list)
+    transitive_dependencies: list[str] = field(default_factory=list)
+    direct_dependents: list[str] = field(default_factory=list)
+    transitive_dependents: list[str] = field(default_factory=list)
     depth: int = 0
     is_root: bool = False
     is_leaf: bool = False
-
 
 class DependencyAnalyzer:
     """Analisa dependencias entre modelos dbt."""
@@ -89,38 +87,38 @@ class DependencyAnalyzer:
             is_leaf=model_name in self.graph.get_leaf_nodes(),
         )
 
-    def analyze_all(self) -> List[DependencyReport]:
+    def analyze_all(self) -> list[DependencyReport]:
         """Analisa dependencias de todos os modelos."""
-        reports: List[DependencyReport] = []
+        reports: list[DependencyReport] = []
         for node_name in self.graph.graph.nodes():
             reports.append(self.analyze_model(node_name))
         return reports
 
-    def find_circular_dependencies(self) -> List[List[str]]:
+    def find_circular_dependencies(self) -> list[list[str]]:
         """Detecta dependencias circulares."""
         return self.graph.detect_cycles()
 
-    def get_execution_order(self) -> List[str]:
+    def get_execution_order(self) -> list[str]:
         """Retorna ordem de execucao respeitando dependencias."""
         return self.graph.topological_sort()
 
-    def get_most_depended_on(self, top_n: int = 10) -> List[Tuple[str, int]]:
+    def get_most_depended_on(self, top_n: int = 10) -> list[tuple[str, int]]:
         """Retorna modelos com mais dependentes."""
-        counts: List[Tuple[str, int]] = []
+        counts: list[tuple[str, int]] = []
         for node in self.graph.graph.nodes():
             dependents = len(self.graph.get_dependents(node))
             counts.append((node, dependents))
         return sorted(counts, key=lambda x: x[1], reverse=True)[:top_n]
 
-    def get_most_dependencies(self, top_n: int = 10) -> List[Tuple[str, int]]:
+    def get_most_dependencies(self, top_n: int = 10) -> list[tuple[str, int]]:
         """Retorna modelos com mais dependencias."""
-        counts: List[Tuple[str, int]] = []
+        counts: list[tuple[str, int]] = []
         for node in self.graph.graph.nodes():
             deps = len(self.graph.get_dependencies(node))
             counts.append((node, deps))
         return sorted(counts, key=lambda x: x[1], reverse=True)[:top_n]
 
-    def get_isolated_models(self) -> Set[str]:
+    def get_isolated_models(self) -> set[str]:
         """Retorna modelos sem dependencias e sem dependentes."""
         isolated = set()
         for node in self.graph.graph.nodes():

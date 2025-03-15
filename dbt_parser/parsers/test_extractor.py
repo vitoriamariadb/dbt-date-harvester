@@ -4,12 +4,11 @@ import logging
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 from dbt_parser.parsers.schema_extractor import SchemaExtractor
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class DbtTest:
@@ -17,12 +16,11 @@ class DbtTest:
 
     name: str
     test_type: str  # "schema", "data", "custom"
-    model_name: Optional[str] = None
-    column_name: Optional[str] = None
-    config: Dict[str, Any] = field(default_factory=dict)
-    filepath: Optional[str] = None
+    model_name: str | None = None
+    column_name: str | None = None
+    config: dict[str, Any] = field(default_factory=dict)
+    filepath: str | None = None
     severity: str = "error"
-
 
 class TestExtractor:
     """Extrai e cataloga testes dbt do projeto."""
@@ -32,11 +30,11 @@ class TestExtractor:
     def __init__(self, schema_extractor: SchemaExtractor, project_dir: Path) -> None:
         self.schema_extractor = schema_extractor
         self.project_dir = project_dir
-        self._tests: List[DbtTest] = []
+        self._tests: list[DbtTest] = []
 
-    def extract_schema_tests(self) -> List[DbtTest]:
+    def extract_schema_tests(self) -> list[DbtTest]:
         """Extrai testes definidos no schema.yml."""
-        tests: List[DbtTest] = []
+        tests: list[DbtTest] = []
         for model in self.schema_extractor.get_all_models():
             for col in model.columns:
                 for test in col.tests:
@@ -64,9 +62,9 @@ class TestExtractor:
         logger.info("Extraidos %d testes de schema", len(tests))
         return tests
 
-    def extract_data_tests(self) -> List[DbtTest]:
+    def extract_data_tests(self) -> list[DbtTest]:
         """Extrai testes de dados (arquivos SQL na pasta tests/)."""
-        tests: List[DbtTest] = []
+        tests: list[DbtTest] = []
         tests_dir = self.project_dir / "tests"
         if not tests_dir.exists():
             return tests
@@ -90,23 +88,23 @@ class TestExtractor:
         logger.info("Extraidos %d testes de dados", len(tests))
         return tests
 
-    def extract_all(self) -> List[DbtTest]:
+    def extract_all(self) -> list[DbtTest]:
         """Extrai todos os testes do projeto."""
         self._tests.clear()
         self.extract_schema_tests()
         self.extract_data_tests()
         return self._tests.copy()
 
-    def get_tests_by_model(self, model_name: str) -> List[DbtTest]:
+    def get_tests_by_model(self, model_name: str) -> list[DbtTest]:
         """Retorna testes de um modelo."""
         return [t for t in self._tests if t.model_name == model_name]
 
-    def get_models_without_tests(self, all_model_names: Set[str]) -> Set[str]:
+    def get_models_without_tests(self, all_model_names: set[str]) -> set[str]:
         """Retorna modelos sem nenhum teste."""
         tested_models = {t.model_name for t in self._tests if t.model_name}
         return all_model_names - tested_models
 
-    def get_test_coverage(self, all_model_names: Set[str]) -> Dict[str, Any]:
+    def get_test_coverage(self, all_model_names: set[str]) -> dict[str, Any]:
         """Calcula cobertura de testes."""
         total = len(all_model_names)
         tested = len({t.model_name for t in self._tests if t.model_name})
@@ -121,7 +119,7 @@ class TestExtractor:
             "custom_tests": sum(1 for t in self._tests if t.test_type == "custom"),
         }
 
-    def get_test_summary(self) -> Dict[str, int]:
+    def get_test_summary(self) -> dict[str, int]:
         """Retorna resumo de testes."""
         return {
             "total": len(self._tests),

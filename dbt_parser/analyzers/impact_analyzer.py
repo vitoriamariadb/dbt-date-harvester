@@ -2,24 +2,22 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class ImpactReport:
     """Relatorio de impacto de uma mudanca."""
 
     changed_model: str
-    directly_affected: List[str] = field(default_factory=list)
-    transitively_affected: List[str] = field(default_factory=list)
+    directly_affected: list[str] = field(default_factory=list)
+    transitively_affected: list[str] = field(default_factory=list)
     total_affected: int = 0
-    affected_by_type: Dict[str, int] = field(default_factory=dict)
+    affected_by_type: dict[str, int] = field(default_factory=dict)
     risk_level: str = "low"  # "low", "medium", "high", "critical"
-
 
 class ImpactAnalyzer:
     """Analisa impacto de mudancas em modelos dbt."""
@@ -38,7 +36,7 @@ class ImpactAnalyzer:
         directly_affected = sorted(self.graph.get_dependents(model_name))
         transitively_affected = sorted(self.graph.get_all_downstream(model_name))
 
-        affected_by_type: Dict[str, int] = {}
+        affected_by_type: dict[str, int] = {}
         for affected in transitively_affected:
             node_data = dict(self.graph.graph.nodes.get(affected, {}))
             node_type = node_data.get("node_type", "unknown")
@@ -65,31 +63,31 @@ class ImpactAnalyzer:
         return report
 
     def analyze_multiple_changes(
-        self, model_names: List[str]
-    ) -> Dict[str, ImpactReport]:
+        self, model_names: list[str]
+    ) -> dict[str, ImpactReport]:
         """Analisa impacto de mudancas em multiplos modelos."""
-        reports: Dict[str, ImpactReport] = {}
+        reports: dict[str, ImpactReport] = {}
         for name in model_names:
             reports[name] = self.analyze_impact(name)
         return reports
 
-    def get_combined_impact(self, model_names: List[str]) -> Set[str]:
+    def get_combined_impact(self, model_names: list[str]) -> set[str]:
         """Retorna conjunto combinado de todos os modelos afetados."""
-        affected: Set[str] = set()
+        affected: set[str] = set()
         for name in model_names:
             affected.update(self.graph.get_all_downstream(name))
         return affected
 
-    def find_high_impact_models(self, threshold: int = 5) -> List[Tuple[str, int]]:
+    def find_high_impact_models(self, threshold: int = 5) -> list[tuple[str, int]]:
         """Encontra modelos com alto impacto (muitos dependentes)."""
-        results: List[Tuple[str, int]] = []
+        results: list[tuple[str, int]] = []
         for node in self.graph.graph.nodes():
             downstream_count = len(self.graph.get_all_downstream(node))
             if downstream_count >= threshold:
                 results.append((node, downstream_count))
         return sorted(results, key=lambda x: x[1], reverse=True)
 
-    def get_critical_path(self) -> List[str]:
+    def get_critical_path(self) -> list[str]:
         """Identifica caminho critico (caminho mais longo no grafo)."""
         import networkx as nx
 
@@ -112,9 +110,9 @@ class ImpactAnalyzer:
             return "medium"
         return "low"
 
-    def get_impact_summary(self) -> Dict[str, Any]:
+    def get_impact_summary(self) -> dict[str, Any]:
         """Retorna resumo de impacto do projeto."""
-        impacts: List[Tuple[str, int]] = []
+        impacts: list[tuple[str, int]] = []
         for node in self.graph.graph.nodes():
             count = len(self.graph.get_all_downstream(node))
             impacts.append((node, count))

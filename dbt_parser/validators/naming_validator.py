@@ -3,13 +3,12 @@
 import logging
 import re
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 from dbt_parser.validators.model_validator import Severity, ValidationResult
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class NamingConvention:
@@ -20,7 +19,6 @@ class NamingConvention:
     description: str
     applies_to: str  # "model", "source", "column", "test"
     severity: Severity = Severity.WARNING
-
 
 DEFAULT_CONVENTIONS = [
     NamingConvention(
@@ -50,22 +48,21 @@ DEFAULT_CONVENTIONS = [
     ),
 ]
 
-
 class NamingValidator:
     """Valida convencoes de nomenclatura em projetos dbt."""
 
     def __init__(
         self,
         graph: GraphResolver,
-        conventions: Optional[List[NamingConvention]] = None,
+        conventions: list[NamingConvention | None] = None,
     ) -> None:
         self.graph = graph
         self.conventions = conventions or DEFAULT_CONVENTIONS
-        self._results: List[ValidationResult] = []
+        self._results: list[ValidationResult] = []
 
-    def validate_model_names(self) -> List[ValidationResult]:
+    def validate_model_names(self) -> list[ValidationResult]:
         """Valida nomes de modelos contra convencoes."""
-        results: List[ValidationResult] = []
+        results: list[ValidationResult] = []
 
         model_conventions = [c for c in self.conventions if c.applies_to == "model"]
 
@@ -104,10 +101,10 @@ class NamingValidator:
         return results
 
     def validate_column_names(
-        self, model_columns: Dict[str, List[str]]
-    ) -> List[ValidationResult]:
+        self, model_columns: dict[str, list[str]]
+    ) -> list[ValidationResult]:
         """Valida nomes de colunas contra convencoes."""
-        results: List[ValidationResult] = []
+        results: list[ValidationResult] = []
         col_conventions = [c for c in self.conventions if c.applies_to == "column"]
 
         for model_name, columns in model_columns.items():
@@ -127,8 +124,8 @@ class NamingValidator:
         return results
 
     def validate_all(
-        self, model_columns: Optional[Dict[str, List[str]]] = None
-    ) -> List[ValidationResult]:
+        self, model_columns: dict[str, list[str | None]] = None
+    ) -> list[ValidationResult]:
         """Executa todas as validacoes de nomenclatura."""
         self._results.clear()
         self.validate_model_names()
@@ -140,11 +137,11 @@ class NamingValidator:
         """Adiciona convencao customizada."""
         self.conventions.append(convention)
 
-    def get_results(self) -> List[ValidationResult]:
+    def get_results(self) -> list[ValidationResult]:
         """Retorna todos os resultados de validacao."""
         return self._results.copy()
 
-    def get_summary(self) -> Dict[str, int]:
+    def get_summary(self) -> dict[str, int]:
         """Retorna resumo de validacoes."""
         return {
             "total": len(self._results),

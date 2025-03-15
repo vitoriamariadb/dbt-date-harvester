@@ -4,13 +4,12 @@ import logging
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from dbt_parser.parsers.schema_extractor import ModelInfo, SchemaExtractor
 from dbt_parser.parsers.sql_parser import SqlParser
 
 logger = logging.getLogger(__name__)
-
 
 class Severity(Enum):
     """Severidade de uma violacao."""
@@ -18,7 +17,6 @@ class Severity(Enum):
     ERROR = "error"
     WARNING = "warning"
     INFO = "info"
-
 
 @dataclass
 class ValidationResult:
@@ -28,8 +26,7 @@ class ValidationResult:
     model_name: str
     message: str
     severity: Severity = Severity.WARNING
-    filepath: Optional[str] = None
-
+    filepath: str | None = None
 
 class ModelValidator:
     """Valida modelos dbt contra regras de boas praticas."""
@@ -39,9 +36,9 @@ class ModelValidator:
     ) -> None:
         self.schema_extractor = schema_extractor
         self.sql_parser = sql_parser
-        self._results: List[ValidationResult] = []
+        self._results: list[ValidationResult] = []
 
-    def validate_all(self) -> List[ValidationResult]:
+    def validate_all(self) -> list[ValidationResult]:
         """Executa todas as validacoes."""
         self._results.clear()
         self._validate_descriptions()
@@ -129,15 +126,15 @@ class ModelValidator:
                     )
                 )
 
-    def get_results_by_severity(self, severity: Severity) -> List[ValidationResult]:
+    def get_results_by_severity(self, severity: Severity) -> list[ValidationResult]:
         """Retorna resultados filtrados por severidade."""
         return [r for r in self._results if r.severity == severity]
 
-    def get_results_by_model(self, model_name: str) -> List[ValidationResult]:
+    def get_results_by_model(self, model_name: str) -> list[ValidationResult]:
         """Retorna resultados de um modelo especifico."""
         return [r for r in self._results if r.model_name == model_name]
 
-    def get_summary(self) -> Dict[str, int]:
+    def get_summary(self) -> dict[str, int]:
         """Retorna resumo de validacoes."""
         return {
             "total": len(self._results),

@@ -3,27 +3,25 @@
 import logging
 import re
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Any, Callable
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class FilterCriteria:
     """Criterios de filtragem para modelos."""
 
-    node_types: Optional[Set[str]] = None
-    tags: Optional[Set[str]] = None
-    name_pattern: Optional[str] = None
-    paths: Optional[List[str]] = None
-    materializations: Optional[Set[str]] = None
-    has_tests: Optional[bool] = None
-    min_dependencies: Optional[int] = None
-    max_dependencies: Optional[int] = None
-    exclude_names: Set[str] = field(default_factory=set)
-
+    node_types: set[str | None] = None
+    tags: set[str | None] = None
+    name_pattern: str | None = None
+    paths: list[str | None] = None
+    materializations: set[str | None] = None
+    has_tests: bool | None = None
+    min_dependencies: int | None = None
+    max_dependencies: int | None = None
+    exclude_names: set[str] = field(default_factory=set)
 
 class ModelFilter:
     """Filtra modelos baseado em criterios diversos."""
@@ -31,7 +29,7 @@ class ModelFilter:
     def __init__(self, graph: GraphResolver) -> None:
         self.graph = graph
 
-    def apply_filter(self, criteria: FilterCriteria) -> Set[str]:
+    def apply_filter(self, criteria: FilterCriteria) -> set[str]:
         """Aplica filtro e retorna nomes de modelos que atendem aos criterios."""
         result = set(self.graph.graph.nodes())
 
@@ -84,7 +82,7 @@ class ModelFilter:
 
         return result
 
-    def filter_by_selector(self, selector: str) -> Set[str]:
+    def filter_by_selector(self, selector: str) -> set[str]:
         """Filtra usando sintaxe de seletor dbt-like.
 
         Exemplos:
@@ -128,7 +126,7 @@ class ModelFilter:
 
         return expanded
 
-    def filter_chain(self, criteria_list: List[FilterCriteria]) -> Set[str]:
+    def filter_chain(self, criteria_list: list[FilterCriteria]) -> set[str]:
         """Aplica multiplos filtros em cadeia (intersecao)."""
         if not criteria_list:
             return set(self.graph.graph.nodes())

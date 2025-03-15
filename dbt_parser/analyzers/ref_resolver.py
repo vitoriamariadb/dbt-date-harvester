@@ -3,13 +3,12 @@
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 from dbt_parser.parsers.sql_parser import SqlParser
 from dbt_parser.parsers.schema_extractor import SchemaExtractor
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class ResolvedRef:
@@ -19,8 +18,7 @@ class ResolvedRef:
     target_model: str
     ref_type: str  # "ref", "source"
     resolved: bool = True
-    resolution_path: Optional[str] = None
-
+    resolution_path: str | None = None
 
 class RefResolver:
     """Resolve referencias entre modelos dbt."""
@@ -30,10 +28,10 @@ class RefResolver:
     ) -> None:
         self.sql_parser = sql_parser
         self.schema_extractor = schema_extractor
-        self._resolved_refs: List[ResolvedRef] = []
-        self._unresolved_refs: List[ResolvedRef] = []
+        self._resolved_refs: list[ResolvedRef] = []
+        self._unresolved_refs: list[ResolvedRef] = []
 
-    def resolve_all(self) -> Tuple[List[ResolvedRef], List[ResolvedRef]]:
+    def resolve_all(self) -> tuple[list[ResolvedRef], list[ResolvedRef]]:
         """Resolve todas as referencias do projeto."""
         self._resolved_refs.clear()
         self._unresolved_refs.clear()
@@ -42,7 +40,7 @@ class RefResolver:
         schema_models = {m.name for m in self.schema_extractor.get_all_models()}
         all_known = known_models | schema_models
 
-        known_sources: Set[str] = set()
+        known_sources: set[str] = set()
         for source in self.schema_extractor.get_all_sources():
             for table in source.tables:
                 table_name = table.get("name", "") if isinstance(table, dict) else str(table)
@@ -106,15 +104,15 @@ class RefResolver:
         )
         return self._resolved_refs.copy(), self._unresolved_refs.copy()
 
-    def get_resolved(self) -> List[ResolvedRef]:
+    def get_resolved(self) -> list[ResolvedRef]:
         """Retorna referencias resolvidas."""
         return self._resolved_refs.copy()
 
-    def get_unresolved(self) -> List[ResolvedRef]:
+    def get_unresolved(self) -> list[ResolvedRef]:
         """Retorna referencias nao resolvidas."""
         return self._unresolved_refs.copy()
 
-    def get_resolution_summary(self) -> Dict[str, Any]:
+    def get_resolution_summary(self) -> dict[str, Any]:
         """Retorna resumo da resolucao."""
         total = len(self._resolved_refs) + len(self._unresolved_refs)
         return {
@@ -126,6 +124,6 @@ class RefResolver:
             ),
         }
 
-    def get_models_with_broken_refs(self) -> Set[str]:
+    def get_models_with_broken_refs(self) -> set[str]:
         """Retorna modelos com referencias quebradas."""
         return {r.source_model for r in self._unresolved_refs}

@@ -3,12 +3,11 @@
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 from dbt_parser.parsers.yaml_parser import YamlParser
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class SourceTable:
@@ -16,11 +15,10 @@ class SourceTable:
 
     name: str
     description: str = ""
-    columns: List[Dict[str, Any]] = field(default_factory=list)
-    tests: List[Dict[str, Any]] = field(default_factory=list)
-    loaded_at_field: Optional[str] = None
-    freshness: Optional[Dict[str, Any]] = None
-
+    columns: list[dict[str, Any]] = field(default_factory=list)
+    tests: list[dict[str, Any]] = field(default_factory=list)
+    loaded_at_field: str | None = None
+    freshness: dict[str, Any | None] = None
 
 @dataclass
 class Source:
@@ -28,31 +26,30 @@ class Source:
 
     name: str
     schema: str = ""
-    database: Optional[str] = None
+    database: str | None = None
     description: str = ""
-    tables: List[SourceTable] = field(default_factory=list)
-    tags: List[str] = field(default_factory=list)
-    meta: Dict[str, Any] = field(default_factory=dict)
-
+    tables: list[SourceTable] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
+    meta: dict[str, Any] = field(default_factory=dict)
 
 class SourceParser:
     """Parser especializado para sources dbt."""
 
     def __init__(self, yaml_parser: YamlParser) -> None:
         self.yaml_parser = yaml_parser
-        self._sources: Dict[str, Source] = {}
+        self._sources: dict[str, Source] = {}
 
-    def parse_sources_file(self, filepath: Path) -> List[Source]:
+    def parse_sources_file(self, filepath: Path) -> list[Source]:
         """Faz parsing de um arquivo sources.yml."""
         content = self.yaml_parser.parse_file(filepath)
         if not content:
             return []
 
         raw_sources = content.get("sources", [])
-        sources: List[Source] = []
+        sources: list[Source] = []
 
         for raw in raw_sources:
-            tables: List[SourceTable] = []
+            tables: list[SourceTable] = []
             for raw_table in raw.get("tables", []):
                 table = SourceTable(
                     name=raw_table.get("name", ""),
@@ -79,28 +76,28 @@ class SourceParser:
         logger.info("Sources parsed: %d fontes de %s", len(sources), filepath)
         return sources
 
-    def find_sources_files(self, project_dir: Path) -> List[Path]:
+    def find_sources_files(self, project_dir: Path) -> list[Path]:
         """Encontra arquivos de sources no projeto."""
-        sources_files: List[Path] = []
+        sources_files: list[Path] = []
         for filepath in project_dir.glob("**/sources.yml"):
             sources_files.append(filepath)
         for filepath in project_dir.glob("**/sources.yaml"):
             sources_files.append(filepath)
         return sorted(sources_files)
 
-    def parse_all(self, project_dir: Path) -> Dict[str, Source]:
+    def parse_all(self, project_dir: Path) -> dict[str, Source]:
         """Faz parsing de todos os arquivos de sources."""
         for filepath in self.find_sources_files(project_dir):
             self.parse_sources_file(filepath)
         return self._sources.copy()
 
-    def get_source(self, name: str) -> Optional[Source]:
+    def get_source(self, name: str) -> Source | None:
         """Retorna source por nome."""
         return self._sources.get(name)
 
-    def get_all_table_names(self) -> Set[str]:
+    def get_all_table_names(self) -> set[str]:
         """Retorna todos os nomes de tabelas (source.table)."""
-        tables: Set[str] = set()
+        tables: set[str] = set()
         for source in self._sources.values():
             for table in source.tables:
                 tables.add(f"{source.name}.{table.name}")
@@ -108,7 +105,7 @@ class SourceParser:
 
     def get_source_table(
         self, source_name: str, table_name: str
-    ) -> Optional[SourceTable]:
+    ) -> SourceTable | None:
         """Retorna tabela especifica de um source."""
         source = self._sources.get(source_name)
         if not source:
@@ -118,9 +115,9 @@ class SourceParser:
                 return table
         return None
 
-    def get_freshness_config(self) -> Dict[str, Dict[str, Any]]:
+    def get_freshness_config(self) -> dict[str, dict[str, Any]]:
         """Retorna configuracoes de freshness por source.table."""
-        freshness: Dict[str, Dict[str, Any]] = {}
+        freshness: dict[str, dict[str, Any]] = {}
         for source in self._sources.values():
             for table in source.tables:
                 if table.freshness:

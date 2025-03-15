@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 
@@ -15,7 +15,6 @@ MERMAID_SHAPES = {
     "test": ("{", "}"),
 }
 
-
 class MermaidExporter:
     """Exporta grafos de dependencia para formato Mermaid."""
 
@@ -25,11 +24,11 @@ class MermaidExporter:
     def to_mermaid(
         self,
         direction: str = "LR",
-        title: Optional[str] = None,
-        highlight_nodes: Optional[Set[str]] = None,
+        title: str | None = None,
+        highlight_nodes: set[str | None] = None,
     ) -> str:
         """Gera diagrama Mermaid do grafo."""
-        lines: List[str] = []
+        lines: list[str] = []
 
         if title:
             lines.append(f"---")
@@ -70,9 +69,9 @@ class MermaidExporter:
 
     def to_mermaid_with_subgraphs(self) -> str:
         """Gera Mermaid com subgrafos por tipo."""
-        lines: List[str] = ["graph LR"]
+        lines: list[str] = ["graph LR"]
 
-        groups: Dict[str, List[str]] = {}
+        groups: dict[str, list[str]] = {}
         for name in self.graph.graph.nodes():
             node_data = dict(self.graph.graph.nodes[name])
             node_type = node_data.get("node_type", "model")

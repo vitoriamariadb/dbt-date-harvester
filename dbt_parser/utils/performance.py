@@ -4,10 +4,9 @@ import logging
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Generator, List, Optional
+from typing import Any, Callable, Generator
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class TimingResult:
@@ -18,12 +17,11 @@ class TimingResult:
     items_processed: int = 0
     items_per_second: float = 0.0
 
-
 class PerformanceTracker:
     """Rastreia performance de operacoes de parsing."""
 
     def __init__(self) -> None:
-        self._timings: List[TimingResult] = []
+        self._timings: list[TimingResult] = []
 
     @contextmanager
     def track(self, operation: str, item_count: int = 0) -> Generator[None, None, None]:
@@ -50,7 +48,7 @@ class PerformanceTracker:
                 rate,
             )
 
-    def get_timings(self) -> List[TimingResult]:
+    def get_timings(self) -> list[TimingResult]:
         """Retorna todas as medicoes."""
         return self._timings.copy()
 
@@ -58,7 +56,7 @@ class PerformanceTracker:
         """Retorna tempo total em ms."""
         return sum(t.duration_ms for t in self._timings)
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """Retorna resumo de performance."""
         if not self._timings:
             return {"total_operations": 0, "total_time_ms": 0}
@@ -82,10 +80,9 @@ class PerformanceTracker:
         """Limpa todas as medicoes."""
         self._timings.clear()
 
-
-def batch_process(items: list, batch_size: int, processor: Callable) -> List[Any]:
+def batch_process(items: list, batch_size: int, processor: Callable) -> list[Any]:
     """Processa itens em lotes para melhor performance."""
-    results: List[Any] = []
+    results: list[Any] = []
     for i in range(0, len(items), batch_size):
         batch = items[i : i + batch_size]
         batch_results = [processor(item) for item in batch]

@@ -3,7 +3,7 @@
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 from dbt_parser.parsers.yaml_parser import YamlParser
 from dbt_parser.parsers.sql_parser import SqlParser
@@ -24,7 +24,6 @@ VALID_CONFIG_KEYS = {
     "strategy", "updated_at", "check_cols",
 }
 
-
 class ConfigValidator:
     """Valida configuracoes de projeto e modelos dbt."""
 
@@ -34,11 +33,11 @@ class ConfigValidator:
         self.yaml_parser = yaml_parser
         self.sql_parser = sql_parser
         self.project_dir = project_dir
-        self._results: List[ValidationResult] = []
+        self._results: list[ValidationResult] = []
 
-    def validate_project_yml(self) -> List[ValidationResult]:
+    def validate_project_yml(self) -> list[ValidationResult]:
         """Valida dbt_project.yml."""
-        results: List[ValidationResult] = []
+        results: list[ValidationResult] = []
         project_file = self.project_dir / "dbt_project.yml"
 
         if not project_file.exists():
@@ -91,9 +90,9 @@ class ConfigValidator:
         self._results.extend(results)
         return results
 
-    def validate_model_configs(self) -> List[ValidationResult]:
+    def validate_model_configs(self) -> list[ValidationResult]:
         """Valida configuracoes dos modelos SQL."""
-        results: List[ValidationResult] = []
+        results: list[ValidationResult] = []
 
         for name, model in self.sql_parser._parsed_models.items():
             materialized = model.config.get("materialized")
@@ -121,9 +120,9 @@ class ConfigValidator:
         self._results.extend(results)
         return results
 
-    def validate_directory_structure(self) -> List[ValidationResult]:
+    def validate_directory_structure(self) -> list[ValidationResult]:
         """Valida estrutura de diretorios do projeto dbt."""
-        results: List[ValidationResult] = []
+        results: list[ValidationResult] = []
         expected_dirs = ["models", "seeds", "tests", "macros"]
 
         for dir_name in expected_dirs:
@@ -141,7 +140,7 @@ class ConfigValidator:
         self._results.extend(results)
         return results
 
-    def validate_all(self) -> List[ValidationResult]:
+    def validate_all(self) -> list[ValidationResult]:
         """Executa todas as validacoes de configuracao."""
         self._results.clear()
         self.validate_project_yml()
@@ -149,11 +148,11 @@ class ConfigValidator:
         self.validate_directory_structure()
         return self._results.copy()
 
-    def get_results(self) -> List[ValidationResult]:
+    def get_results(self) -> list[ValidationResult]:
         """Retorna resultados de validacao."""
         return self._results.copy()
 
-    def get_summary(self) -> Dict[str, int]:
+    def get_summary(self) -> dict[str, int]:
         """Retorna resumo."""
         return {
             "total": len(self._results),

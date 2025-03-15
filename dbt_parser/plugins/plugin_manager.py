@@ -5,12 +5,11 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Type
+from typing import Any, Callable, Type
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 
 logger = logging.getLogger(__name__)
-
 
 class BasePlugin(ABC):
     """Classe base para plugins do dbt parser."""
@@ -45,17 +44,16 @@ class BasePlugin(ABC):
     def on_validate_start(self) -> None:
         """Chamado antes do inicio da validacao."""
 
-    def on_validate_complete(self, results: List[Any]) -> None:
+    def on_validate_complete(self, results: list[Any]) -> None:
         """Chamado apos conclusao da validacao."""
 
-    def register_validators(self) -> List[Callable]:
+    def register_validators(self) -> list[Callable]:
         """Retorna validadores customizados do plugin."""
         return []
 
-    def register_exporters(self) -> Dict[str, Callable]:
+    def register_exporters(self) -> dict[str, Callable]:
         """Retorna exportadores customizados do plugin."""
         return {}
-
 
 @dataclass
 class PluginInfo:
@@ -65,16 +63,15 @@ class PluginInfo:
     version: str
     description: str
     plugin_class: Type[BasePlugin]
-    instance: Optional[BasePlugin] = None
+    instance: BasePlugin | None = None
     enabled: bool = True
-
 
 class PluginManager:
     """Gerencia ciclo de vida de plugins."""
 
     def __init__(self) -> None:
-        self._plugins: Dict[str, PluginInfo] = {}
-        self._hooks: Dict[str, List[Callable]] = {}
+        self._plugins: dict[str, PluginInfo] = {}
+        self._hooks: dict[str, list[Callable]] = {}
 
     def register(self, plugin_class: Type[BasePlugin]) -> None:
         """Registra um plugin."""
@@ -99,12 +96,12 @@ class PluginManager:
             return True
         return False
 
-    def get_plugin(self, name: str) -> Optional[BasePlugin]:
+    def get_plugin(self, name: str) -> BasePlugin | None:
         """Retorna instancia de um plugin."""
         info = self._plugins.get(name)
         return info.instance if info else None
 
-    def get_all_plugins(self) -> List[PluginInfo]:
+    def get_all_plugins(self) -> list[PluginInfo]:
         """Retorna todos os plugins registrados."""
         return list(self._plugins.values())
 
@@ -139,17 +136,17 @@ class PluginManager:
                         exc,
                     )
 
-    def collect_validators(self) -> List[Callable]:
+    def collect_validators(self) -> list[Callable]:
         """Coleta validadores de todos os plugins."""
-        validators: List[Callable] = []
+        validators: list[Callable] = []
         for info in self._plugins.values():
             if info.enabled and info.instance:
                 validators.extend(info.instance.register_validators())
         return validators
 
-    def collect_exporters(self) -> Dict[str, Callable]:
+    def collect_exporters(self) -> dict[str, Callable]:
         """Coleta exportadores de todos os plugins."""
-        exporters: Dict[str, Callable] = {}
+        exporters: dict[str, Callable] = {}
         for info in self._plugins.values():
             if info.enabled and info.instance:
                 exporters.update(info.instance.register_exporters())
@@ -170,7 +167,7 @@ class PluginManager:
         except ImportError as exc:
             logger.error("Erro ao carregar modulo de plugin %s: %s", module_path, exc)
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """Retorna resumo de plugins."""
         return {
             "total_plugins": len(self._plugins),

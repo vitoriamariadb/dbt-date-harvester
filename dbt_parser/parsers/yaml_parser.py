@@ -2,12 +2,11 @@
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import yaml
 
 logger = logging.getLogger(__name__)
-
 
 class YamlParser:
     """Parser para arquivos YAML de projetos dbt.
@@ -19,9 +18,9 @@ class YamlParser:
 
     def __init__(self, project_dir: Path) -> None:
         self.project_dir = project_dir
-        self._parsed_files: Dict[str, Dict[str, Any]] = {}
+        self._parsed_files: dict[str, dict[str, Any]] = {}
 
-    def parse_file(self, filepath: Path) -> Dict[str, Any]:
+    def parse_file(self, filepath: Path) -> dict[str, Any]:
         """Faz parsing de um arquivo YAML individual."""
         if not filepath.exists():
             logger.warning("Arquivo nao encontrado: %s", filepath)
@@ -39,34 +38,34 @@ class YamlParser:
             logger.error("Erro ao parsear YAML %s: %s", filepath, exc)
             raise
 
-    def find_yaml_files(self) -> List[Path]:
+    def find_yaml_files(self) -> list[Path]:
         """Encontra todos os arquivos YAML no projeto dbt."""
         yaml_files = []
         for pattern in ("**/*.yml", "**/*.yaml"):
             yaml_files.extend(self.project_dir.glob(pattern))
         return sorted(yaml_files)
 
-    def parse_all(self) -> Dict[str, Dict[str, Any]]:
+    def parse_all(self) -> dict[str, dict[str, Any]]:
         """Faz parsing de todos os arquivos YAML encontrados."""
-        results: Dict[str, Dict[str, Any]] = {}
+        results: dict[str, dict[str, Any]] = {}
         for filepath in self.find_yaml_files():
             parsed = self.parse_file(filepath)
             if parsed:
                 results[str(filepath)] = parsed
         return results
 
-    def get_parsed_files(self) -> Dict[str, Dict[str, Any]]:
+    def get_parsed_files(self) -> dict[str, dict[str, Any]]:
         """Retorna arquivos ja parseados."""
         return self._parsed_files.copy()
 
-    def extract_version(self, content: Dict[str, Any]) -> Optional[int]:
+    def extract_version(self, content: dict[str, Any]) -> int | None:
         """Extrai versao do schema YAML."""
         return content.get("version")
 
-    def extract_models_section(self, content: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def extract_models_section(self, content: dict[str, Any]) -> list[dict[str, Any]]:
         """Extrai secao de modelos de um schema.yml."""
         return content.get("models", [])
 
-    def extract_sources_section(self, content: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def extract_sources_section(self, content: dict[str, Any]) -> list[dict[str, Any]]:
         """Extrai secao de sources de um sources.yml."""
         return content.get("sources", [])

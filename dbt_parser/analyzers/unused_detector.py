@@ -2,23 +2,21 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class UnusedReport:
     """Relatorio de modelos nao utilizados."""
 
-    unused_models: List[str] = field(default_factory=list)
-    orphan_sources: List[str] = field(default_factory=list)
-    dead_end_models: List[str] = field(default_factory=list)
-    unused_macros: List[str] = field(default_factory=list)
+    unused_models: list[str] = field(default_factory=list)
+    orphan_sources: list[str] = field(default_factory=list)
+    dead_end_models: list[str] = field(default_factory=list)
+    unused_macros: list[str] = field(default_factory=list)
     total_unused: int = 0
-
 
 class UnusedDetector:
     """Detecta modelos, sources e macros nao utilizados."""
@@ -26,12 +24,12 @@ class UnusedDetector:
     def __init__(self, graph: GraphResolver) -> None:
         self.graph = graph
 
-    def detect_unused_models(self, exposure_models: Optional[Set[str]] = None) -> List[str]:
+    def detect_unused_models(self, exposure_models: set[str | None] = None) -> list[str]:
         """Detecta modelos sem nenhum dependente (nao expostos)."""
         leaf_nodes = self.graph.get_leaf_nodes()
         exposures = exposure_models or set()
 
-        unused: List[str] = []
+        unused: list[str] = []
         for node in leaf_nodes:
             node_data = dict(self.graph.graph.nodes.get(node, {}))
             if node_data.get("node_type") == "model" and node not in exposures:
@@ -42,9 +40,9 @@ class UnusedDetector:
 
         return sorted(unused)
 
-    def detect_orphan_sources(self) -> List[str]:
+    def detect_orphan_sources(self) -> list[str]:
         """Detecta sources declarados mas nao referenciados por nenhum modelo."""
-        orphans: List[str] = []
+        orphans: list[str] = []
         for node in self.graph.graph.nodes():
             node_data = dict(self.graph.graph.nodes.get(node, {}))
             if node_data.get("node_type") == "source":
@@ -57,9 +55,9 @@ class UnusedDetector:
 
         return sorted(orphans)
 
-    def detect_dead_end_models(self) -> List[str]:
+    def detect_dead_end_models(self) -> list[str]:
         """Detecta modelos que nao sao referenciados e nao sao folhas finais."""
-        dead_ends: List[str] = []
+        dead_ends: list[str] = []
         for node in self.graph.graph.nodes():
             node_data = dict(self.graph.graph.nodes.get(node, {}))
             if node_data.get("node_type") == "model":
@@ -69,9 +67,9 @@ class UnusedDetector:
                     dead_ends.append(node)
         return sorted(dead_ends)
 
-    def detect_isolated_nodes(self) -> List[str]:
+    def detect_isolated_nodes(self) -> list[str]:
         """Detecta nos completamente isolados (sem dependencias nem dependentes)."""
-        isolated: List[str] = []
+        isolated: list[str] = []
         for node in self.graph.graph.nodes():
             if (
                 self.graph.graph.in_degree(node) == 0
@@ -82,16 +80,16 @@ class UnusedDetector:
 
     def generate_report(
         self,
-        exposure_models: Optional[Set[str]] = None,
-        known_macros: Optional[Set[str]] = None,
-        used_macros: Optional[Set[str]] = None,
+        exposure_models: set[str | None] = None,
+        known_macros: set[str | None] = None,
+        used_macros: set[str | None] = None,
     ) -> UnusedReport:
         """Gera relatorio completo de artefatos nao utilizados."""
         unused_models = self.detect_unused_models(exposure_models)
         orphan_sources = self.detect_orphan_sources()
         dead_ends = self.detect_dead_end_models()
 
-        unused_macro_list: List[str] = []
+        unused_macro_list: list[str] = []
         if known_macros and used_macros:
             unused_macro_list = sorted(known_macros - used_macros)
 

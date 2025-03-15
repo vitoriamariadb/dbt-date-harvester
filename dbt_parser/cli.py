@@ -4,12 +4,10 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import List, Optional
 
 from dbt_parser import __version__
 
 logger = logging.getLogger(__name__)
-
 
 def setup_logging(verbosity: int) -> None:
     """Configura logging baseado no nivel de verbosidade."""
@@ -24,7 +22,6 @@ def setup_logging(verbosity: int) -> None:
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
     root_logger.addHandler(handler)
-
 
 def create_parser() -> argparse.ArgumentParser:
     """Cria parser de argumentos da CLI."""
@@ -89,7 +86,6 @@ def create_parser() -> argparse.ArgumentParser:
 
     return parser
 
-
 def run_parse(args: argparse.Namespace) -> int:
     """Executa comando de parsing."""
     from dbt_parser.parsers.yaml_parser import YamlParser
@@ -115,7 +111,6 @@ def run_parse(args: argparse.Namespace) -> int:
         print(f"  - {name}: refs={model.refs}, sources={model.sources}")
 
     return 0
-
 
 def run_graph(args: argparse.Namespace) -> int:
     """Executa comando de analise de grafo."""
@@ -143,7 +138,6 @@ def run_graph(args: argparse.Namespace) -> int:
         print(f"Folhas: {sorted(graph.get_leaf_nodes())}")
 
     return 0
-
 
 def run_validate(args: argparse.Namespace) -> int:
     """Executa comando de validacao."""
@@ -183,7 +177,6 @@ def run_validate(args: argparse.Namespace) -> int:
 
     return 1 if summary["errors"] > 0 else 0
 
-
 def run_lineage(args: argparse.Namespace) -> int:
     """Executa comando de linhagem."""
     from dbt_parser.parsers.sql_parser import SqlParser
@@ -210,7 +203,6 @@ def run_lineage(args: argparse.Namespace) -> int:
 
     return 0
 
-
 COMMAND_MAP = {
     "parse": run_parse,
     "graph": run_graph,
@@ -218,8 +210,7 @@ COMMAND_MAP = {
     "lineage": run_lineage,
 }
 
-
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str | None] = None) -> int:
     """Ponto de entrada principal da CLI."""
     parser = create_parser()
     args = parser.parse_args(argv)
@@ -236,7 +227,6 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     parser.print_help()
     return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

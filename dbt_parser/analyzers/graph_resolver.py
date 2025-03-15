@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     import networkx as nx
 
 logger = logging.getLogger(__name__)
-
 
 def _import_networkx():
     """Importa networkx sob demanda para evitar falha em ambientes sem _bz2."""
@@ -23,17 +22,15 @@ def _import_networkx():
             "Instale com: pip install networkx"
         ) from exc
 
-
 @dataclass
 class NodeInfo:
     """Informacoes de um no no grafo de dependencias."""
 
     name: str
     node_type: str  # "model", "source", "seed", "test"
-    filepath: Optional[str] = None
-    config: Dict[str, Any] = field(default_factory=dict)
-    tags: List[str] = field(default_factory=list)
-
+    filepath: str | None = None
+    config: dict[str, Any] = field(default_factory=dict)
+    tags: list[str] = field(default_factory=list)
 
 class GraphResolver:
     """Constroi e resolve grafos de dependencia de projetos dbt."""
@@ -41,7 +38,7 @@ class GraphResolver:
     def __init__(self) -> None:
         nx = _import_networkx()
         self.graph: nx.DiGraph = nx.DiGraph()
-        self._nodes: Dict[str, NodeInfo] = {}
+        self._nodes: dict[str, NodeInfo] = {}
 
     def add_node(self, node: NodeInfo) -> None:
         """Adiciona um no ao grafo."""
@@ -59,33 +56,33 @@ class GraphResolver:
         self.graph.add_edge(from_node, to_node)
         logger.debug("Aresta adicionada: %s -> %s", from_node, to_node)
 
-    def get_dependencies(self, node_name: str) -> Set[str]:
+    def get_dependencies(self, node_name: str) -> set[str]:
         """Retorna dependencias diretas de um no."""
         if node_name not in self.graph:
             return set()
         return set(self.graph.successors(node_name))
 
-    def get_dependents(self, node_name: str) -> Set[str]:
+    def get_dependents(self, node_name: str) -> set[str]:
         """Retorna nos que dependem diretamente deste no."""
         if node_name not in self.graph:
             return set()
         return set(self.graph.predecessors(node_name))
 
-    def get_all_upstream(self, node_name: str) -> Set[str]:
+    def get_all_upstream(self, node_name: str) -> set[str]:
         """Retorna todas as dependencias transitivas (upstream)."""
         nx = _import_networkx()
         if node_name not in self.graph:
             return set()
         return set(nx.descendants(self.graph, node_name))
 
-    def get_all_downstream(self, node_name: str) -> Set[str]:
+    def get_all_downstream(self, node_name: str) -> set[str]:
         """Retorna todos os dependentes transitivos (downstream)."""
         nx = _import_networkx()
         if node_name not in self.graph:
             return set()
         return set(nx.ancestors(self.graph, node_name))
 
-    def topological_sort(self) -> List[str]:
+    def topological_sort(self) -> list[str]:
         """Retorna ordem topologica de execucao."""
         nx = _import_networkx()
         try:
@@ -94,7 +91,7 @@ class GraphResolver:
             logger.error("Ciclo detectado no grafo de dependencias")
             raise ValueError("Ciclo detectado no grafo de dependencias")
 
-    def detect_cycles(self) -> List[List[str]]:
+    def detect_cycles(self) -> list[list[str]]:
         """Detecta ciclos no grafo."""
         nx = _import_networkx()
         try:
@@ -105,15 +102,15 @@ class GraphResolver:
         except nx.NetworkXError:
             return []
 
-    def get_root_nodes(self) -> Set[str]:
+    def get_root_nodes(self) -> set[str]:
         """Retorna nos raiz (sem dependencias)."""
         return {n for n in self.graph.nodes() if self.graph.out_degree(n) == 0}
 
-    def get_leaf_nodes(self) -> Set[str]:
+    def get_leaf_nodes(self) -> set[str]:
         """Retorna nos folha (sem dependentes)."""
         return {n for n in self.graph.nodes() if self.graph.in_degree(n) == 0}
 
-    def get_node_info(self, name: str) -> Optional[NodeInfo]:
+    def get_node_info(self, name: str) -> NodeInfo | None:
         """Retorna informacoes de um no."""
         return self._nodes.get(name)
 
@@ -125,7 +122,7 @@ class GraphResolver:
         """Retorna numero de arestas no grafo."""
         return self.graph.number_of_edges()
 
-    def get_subgraph(self, nodes: Set[str]) -> "GraphResolver":
+    def get_subgraph(self, nodes: set[str]) -> "GraphResolver":
         """Retorna subgrafo contendo apenas os nos especificados."""
         sub = GraphResolver()
         sub.graph = self.graph.subgraph(nodes).copy()

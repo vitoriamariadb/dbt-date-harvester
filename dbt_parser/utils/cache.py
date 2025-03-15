@@ -6,12 +6,11 @@ import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, TypeVar
+from typing import Any, Callable, TypeVar
 
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
-
 
 @dataclass
 class CacheEntry:
@@ -21,7 +20,7 @@ class CacheEntry:
     value: Any
     created_at: float
     ttl: float
-    file_hash: Optional[str] = None
+    file_hash: str | None = None
 
     @property
     def is_expired(self) -> bool:
@@ -29,17 +28,16 @@ class CacheEntry:
             return False
         return (time.time() - self.created_at) > self.ttl
 
-
 class ResultCache:
     """Cache em memoria para resultados de parsing."""
 
     def __init__(self, default_ttl: float = 300.0) -> None:
         self.default_ttl = default_ttl
-        self._cache: Dict[str, CacheEntry] = {}
+        self._cache: dict[str, CacheEntry] = {}
         self._hits: int = 0
         self._misses: int = 0
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """Recupera valor do cache."""
         entry = self._cache.get(key)
         if entry is None:
@@ -56,8 +54,8 @@ class ResultCache:
         self,
         key: str,
         value: Any,
-        ttl: Optional[float] = None,
-        file_hash: Optional[str] = None,
+        ttl: float | None = None,
+        file_hash: str | None = None,
     ) -> None:
         """Armazena valor no cache."""
         self._cache[key] = CacheEntry(
@@ -101,7 +99,7 @@ class ResultCache:
         self,
         key: str,
         compute_fn: Callable[[], Any],
-        ttl: Optional[float] = None,
+        ttl: float | None = None,
     ) -> Any:
         """Retorna do cache ou computa e armazena."""
         cached = self.get(key)
@@ -111,7 +109,7 @@ class ResultCache:
         self.set(key, value, ttl)
         return value
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Retorna estatisticas do cache."""
         total = self._hits + self._misses
         return {
@@ -122,7 +120,7 @@ class ResultCache:
         }
 
     @staticmethod
-    def _compute_file_hash(filepath: Path) -> Optional[str]:
+    def _compute_file_hash(filepath: Path) -> str | None:
         """Computa hash de um arquivo."""
         if not filepath.exists():
             return None

@@ -2,12 +2,11 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver, NodeInfo
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class LineageEntry:
@@ -16,20 +15,19 @@ class LineageEntry:
     source_node: str
     target_node: str
     lineage_type: str  # "ref", "source", "macro"
-    columns: List[str] = field(default_factory=list)
+    columns: list[str] = field(default_factory=list)
     transformation: str = ""
-
 
 class LineageTracker:
     """Rastreia linhagem de dados atraves do projeto dbt."""
 
     def __init__(self, graph_resolver: GraphResolver) -> None:
         self.graph_resolver = graph_resolver
-        self._lineage_entries: List[LineageEntry] = []
-        self._column_lineage: Dict[str, Dict[str, List[str]]] = {}
+        self._lineage_entries: list[LineageEntry] = []
+        self._column_lineage: dict[str, dict[str, list[str]]] = {}
 
     def track_ref_lineage(
-        self, model_name: str, referenced_model: str, columns: Optional[List[str]] = None
+        self, model_name: str, referenced_model: str, columns: list[str | None] = None
     ) -> LineageEntry:
         """Registra linhagem via ref()."""
         entry = LineageEntry(
@@ -47,7 +45,7 @@ class LineageTracker:
         model_name: str,
         source_name: str,
         table_name: str,
-        columns: Optional[List[str]] = None,
+        columns: list[str | None] = None,
     ) -> LineageEntry:
         """Registra linhagem via source()."""
         source_key = f"{source_name}.{table_name}"
@@ -61,7 +59,7 @@ class LineageTracker:
         logger.info("Linhagem source: %s -> %s", source_key, model_name)
         return entry
 
-    def get_full_lineage(self, model_name: str) -> Dict[str, Any]:
+    def get_full_lineage(self, model_name: str) -> dict[str, Any]:
         """Retorna linhagem completa de um modelo (upstream e downstream)."""
         upstream = self.graph_resolver.get_all_upstream(model_name)
         downstream = self.graph_resolver.get_all_downstream(model_name)
@@ -80,8 +78,8 @@ class LineageTracker:
         }
 
     def get_lineage_entries(
-        self, model_name: Optional[str] = None
-    ) -> List[LineageEntry]:
+        self, model_name: str | None = None
+    ) -> list[LineageEntry]:
         """Retorna entradas de linhagem, opcionalmente filtradas por modelo."""
         if model_name is None:
             return self._lineage_entries.copy()
@@ -91,7 +89,7 @@ class LineageTracker:
             if e.source_node == model_name or e.target_node == model_name
         ]
 
-    def get_data_flow_path(self, source: str, target: str) -> List[List[str]]:
+    def get_data_flow_path(self, source: str, target: str) -> list[list[str]]:
         """Encontra caminhos de fluxo de dados entre dois nos."""
         import networkx as nx
 
@@ -105,14 +103,14 @@ class LineageTracker:
             return []
 
     def track_column_lineage(
-        self, model_name: str, column_name: str, source_columns: List[str]
+        self, model_name: str, column_name: str, source_columns: list[str]
     ) -> None:
         """Registra linhagem em nivel de coluna."""
         if model_name not in self._column_lineage:
             self._column_lineage[model_name] = {}
         self._column_lineage[model_name][column_name] = source_columns
 
-    def get_column_lineage(self, model_name: str) -> Dict[str, List[str]]:
+    def get_column_lineage(self, model_name: str) -> dict[str, list[str]]:
         """Retorna linhagem de colunas de um modelo."""
         return self._column_lineage.get(model_name, {})
 
@@ -133,7 +131,7 @@ class LineageTracker:
 
         return max(lengths.values()) if lengths else 0
 
-    def get_lineage_summary(self) -> Dict[str, Any]:
+    def get_lineage_summary(self) -> dict[str, Any]:
         """Retorna resumo da linhagem do projeto."""
         return {
             "total_entries": len(self._lineage_entries),

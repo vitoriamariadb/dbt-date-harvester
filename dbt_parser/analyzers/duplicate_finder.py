@@ -4,22 +4,20 @@ import hashlib
 import logging
 import re
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 from dbt_parser.parsers.sql_parser import SqlParser
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class DuplicateGroup:
     """Grupo de modelos com logica similar."""
 
     pattern_hash: str
-    models: List[str] = field(default_factory=list)
+    models: list[str] = field(default_factory=list)
     similarity_score: float = 0.0
     pattern_description: str = ""
-
 
 class DuplicateFinder:
     """Detecta padroes SQL duplicados em modelos dbt."""
@@ -27,9 +25,9 @@ class DuplicateFinder:
     def __init__(self, sql_parser: SqlParser) -> None:
         self.sql_parser = sql_parser
 
-    def find_duplicate_ctes(self) -> Dict[str, List[str]]:
+    def find_duplicate_ctes(self) -> dict[str, list[str]]:
         """Encontra CTEs com nomes identicos em modelos diferentes."""
-        cte_map: Dict[str, List[str]] = {}
+        cte_map: dict[str, list[str]] = {}
         for name, model in self.sql_parser._parsed_models.items():
             for cte in model.ctes:
                 if cte not in cte_map:
@@ -38,17 +36,17 @@ class DuplicateFinder:
 
         return {cte: models for cte, models in cte_map.items() if len(models) > 1}
 
-    def find_similar_models(self, threshold: float = 0.7) -> List[DuplicateGroup]:
+    def find_similar_models(self, threshold: float = 0.7) -> list[DuplicateGroup]:
         """Encontra modelos com SQL estruturalmente similar."""
         models = list(self.sql_parser._parsed_models.items())
-        groups: List[DuplicateGroup] = []
-        processed: Set[str] = set()
+        groups: list[DuplicateGroup] = []
+        processed: set[str] = set()
 
         for i, (name1, model1) in enumerate(models):
             if name1 in processed:
                 continue
 
-            similar: List[str] = [name1]
+            similar: list[str] = [name1]
             normalized1 = self._normalize_sql(model1.raw_sql)
 
             for j in range(i + 1, len(models)):
@@ -78,9 +76,9 @@ class DuplicateFinder:
         logger.info("Grupos de duplicados encontrados: %d", len(groups))
         return groups
 
-    def find_duplicate_configs(self) -> Dict[str, List[str]]:
+    def find_duplicate_configs(self) -> dict[str, list[str]]:
         """Encontra modelos com configuracoes identicas."""
-        config_map: Dict[str, List[str]] = {}
+        config_map: dict[str, list[str]] = {}
         for name, model in self.sql_parser._parsed_models.items():
             if model.config:
                 config_key = str(sorted(model.config.items()))
@@ -117,7 +115,7 @@ class DuplicateFinder:
         union = tokens1 | tokens2
         return len(intersection) / len(union)
 
-    def get_duplicate_summary(self) -> Dict[str, Any]:
+    def get_duplicate_summary(self) -> dict[str, Any]:
         """Retorna resumo de duplicados."""
         dup_ctes = self.find_duplicate_ctes()
         similar = self.find_similar_models()

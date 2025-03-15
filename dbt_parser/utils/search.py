@@ -2,12 +2,11 @@
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class SearchResult:
@@ -18,13 +17,12 @@ class SearchResult:
     node_type: str
     match_type: str  # "exact", "prefix", "contains", "fuzzy"
 
-
 class FuzzySearch:
     """Busca fuzzy em nomes de modelos e artefatos dbt."""
 
     def __init__(self, graph: GraphResolver) -> None:
         self.graph = graph
-        self._index: Dict[str, Dict[str, Any]] = {}
+        self._index: dict[str, dict[str, Any]] = {}
         self._build_index()
 
     def _build_index(self) -> None:
@@ -37,10 +35,10 @@ class FuzzySearch:
                 "tags": node_data.get("tags", []),
             }
 
-    def search(self, query: str, limit: int = 10) -> List[SearchResult]:
+    def search(self, query: str, limit: int = 10) -> list[SearchResult]:
         """Busca modelos por nome com matching fuzzy."""
         query_lower = query.lower()
-        results: List[SearchResult] = []
+        results: list[SearchResult] = []
 
         for key, data in self._index.items():
             if key == query_lower:
@@ -87,9 +85,9 @@ class FuzzySearch:
         results.sort(key=lambda r: r.score, reverse=True)
         return results[:limit]
 
-    def search_by_tag(self, tag: str) -> List[str]:
+    def search_by_tag(self, tag: str) -> list[str]:
         """Busca modelos por tag."""
-        results: List[str] = []
+        results: list[str] = []
         for key, data in self._index.items():
             if tag in data.get("tags", []):
                 results.append(data["original_name"])

@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver
 
@@ -35,7 +35,6 @@ NODE_STYLES = {
     },
 }
 
-
 class GraphvizExporter:
     """Exporta grafos de dependencia para formato GraphViz DOT."""
 
@@ -45,11 +44,11 @@ class GraphvizExporter:
     def to_dot(
         self,
         title: str = "dbt Dependency Graph",
-        highlight_nodes: Optional[Set[str]] = None,
+        highlight_nodes: set[str | None] = None,
         rankdir: str = "LR",
     ) -> str:
         """Gera representacao DOT do grafo."""
-        lines: List[str] = []
+        lines: list[str] = []
         lines.append(f'digraph "{title}" {{')
         lines.append(f"  rankdir={rankdir};")
         lines.append('  node [fontname="Helvetica" fontsize=10];')
@@ -92,7 +91,7 @@ class GraphvizExporter:
         logger.info("GraphViz exportado: %s", filepath)
 
     def to_dot_subgraph(
-        self, nodes: Set[str], title: str = "Subgraph"
+        self, nodes: set[str], title: str = "Subgraph"
     ) -> str:
         """Gera DOT para um subgrafo."""
         sub = self.graph.get_subgraph(nodes)
@@ -101,13 +100,13 @@ class GraphvizExporter:
 
     def to_dot_with_layers(self) -> str:
         """Gera DOT agrupando por tipo de no (source, staging, marts)."""
-        lines: List[str] = []
+        lines: list[str] = []
         lines.append('digraph "dbt Layered Graph" {')
         lines.append("  rankdir=LR;")
         lines.append('  node [fontname="Helvetica" fontsize=10];')
         lines.append("")
 
-        groups: Dict[str, List[str]] = {}
+        groups: dict[str, list[str]] = {}
         for name in self.graph.graph.nodes():
             node_data = dict(self.graph.graph.nodes[name])
             node_type = node_data.get("node_type", "model")

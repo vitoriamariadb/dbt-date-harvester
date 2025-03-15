@@ -3,12 +3,11 @@
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from dbt_parser.parsers.yaml_parser import YamlParser
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class ColumnInfo:
@@ -16,9 +15,8 @@ class ColumnInfo:
 
     name: str
     description: str = ""
-    tests: List[Dict[str, Any]] = field(default_factory=list)
-    meta: Dict[str, Any] = field(default_factory=dict)
-
+    tests: list[dict[str, Any]] = field(default_factory=list)
+    meta: dict[str, Any] = field(default_factory=dict)
 
 @dataclass
 class ModelInfo:
@@ -26,11 +24,10 @@ class ModelInfo:
 
     name: str
     description: str = ""
-    columns: List[ColumnInfo] = field(default_factory=list)
-    tests: List[Dict[str, Any]] = field(default_factory=list)
-    meta: Dict[str, Any] = field(default_factory=dict)
-    tags: List[str] = field(default_factory=list)
-
+    columns: list[ColumnInfo] = field(default_factory=list)
+    tests: list[dict[str, Any]] = field(default_factory=list)
+    meta: dict[str, Any] = field(default_factory=dict)
+    tags: list[str] = field(default_factory=list)
 
 @dataclass
 class SourceInfo:
@@ -39,21 +36,20 @@ class SourceInfo:
     name: str
     schema: str = ""
     description: str = ""
-    tables: List[Dict[str, Any]] = field(default_factory=list)
-
+    tables: list[dict[str, Any]] = field(default_factory=list)
 
 class SchemaExtractor:
     """Extrai informacoes estruturadas de schema.yml e sources.yml."""
 
     def __init__(self, yaml_parser: YamlParser) -> None:
         self.yaml_parser = yaml_parser
-        self._models: List[ModelInfo] = []
-        self._sources: List[SourceInfo] = []
+        self._models: list[ModelInfo] = []
+        self._sources: list[SourceInfo] = []
 
-    def extract_models(self, content: Dict[str, Any]) -> List[ModelInfo]:
+    def extract_models(self, content: dict[str, Any]) -> list[ModelInfo]:
         """Extrai modelos de um schema.yml parseado."""
         raw_models = self.yaml_parser.extract_models_section(content)
-        models: List[ModelInfo] = []
+        models: list[ModelInfo] = []
 
         for raw_model in raw_models:
             columns = []
@@ -81,10 +77,10 @@ class SchemaExtractor:
         logger.info("Extraidos %d modelos do schema", len(models))
         return models
 
-    def extract_sources(self, content: Dict[str, Any]) -> List[SourceInfo]:
+    def extract_sources(self, content: dict[str, Any]) -> list[SourceInfo]:
         """Extrai sources de um sources.yml parseado."""
         raw_sources = self.yaml_parser.extract_sources_section(content)
-        sources: List[SourceInfo] = []
+        sources: list[SourceInfo] = []
 
         for raw_source in raw_sources:
             source = SourceInfo(
@@ -99,22 +95,22 @@ class SchemaExtractor:
         logger.info("Extraidos %d sources", len(sources))
         return sources
 
-    def get_all_models(self) -> List[ModelInfo]:
+    def get_all_models(self) -> list[ModelInfo]:
         """Retorna todos os modelos extraidos."""
         return self._models.copy()
 
-    def get_all_sources(self) -> List[SourceInfo]:
+    def get_all_sources(self) -> list[SourceInfo]:
         """Retorna todos os sources extraidos."""
         return self._sources.copy()
 
-    def get_model_by_name(self, name: str) -> Optional[ModelInfo]:
+    def get_model_by_name(self, name: str) -> ModelInfo | None:
         """Busca modelo por nome."""
         for model in self._models:
             if model.name == name:
                 return model
         return None
 
-    def get_column_tests(self, model_name: str) -> Dict[str, List[Dict[str, Any]]]:
+    def get_column_tests(self, model_name: str) -> dict[str, list[dict[str, Any]]]:
         """Retorna testes por coluna de um modelo."""
         model = self.get_model_by_name(model_name)
         if not model:
