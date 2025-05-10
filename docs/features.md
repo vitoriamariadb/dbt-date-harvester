@@ -33,13 +33,13 @@ from dbt_parser.parsers.jinja_parser import JinjaParser
 
 parser = JinjaParser()
 analysis = parser.parse_content(sql_content, "model.sql")
-print(f"Variaveis: {analysis.variables}")
+print(f"Variáveis: {analysis.variables}")
 ```
 
-## Analise
+## Análise
 
-### Grafo de Dependencias
-Constroi e consulta grafo de dependencias entre modelos.
+### Grafo de Dependências
+Constrói e consulta grafo de dependências entre modelos.
 
 ```python
 from dbt_parser.analyzers.graph_resolver import GraphResolver
@@ -61,8 +61,8 @@ tracker = LineageTracker(graph)
 lineage = tracker.get_full_lineage("fct_event_dates")
 ```
 
-### Analise de Impacto
-Avalia impacto de mudancas em modelos.
+### Análise de Impacto
+Avalia impacto de mudanças em modelos.
 
 ```python
 from dbt_parser.analyzers.impact_analyzer import ImpactAnalyzer
@@ -72,7 +72,7 @@ report = impact.analyze_impact("stg_events")
 print(f"Risco: {report.risk_level}")
 ```
 
-### Detector de Nao Utilizados
+### Detector de Não Utilizados
 Encontra modelos, sources e macros sem uso.
 
 ```python
@@ -82,7 +82,7 @@ detector = UnusedDetector(graph)
 report = detector.generate_report()
 ```
 
-### Metricas de Complexidade
+### Métricas de Complexidade
 Calcula score de complexidade por modelo.
 
 ```python
@@ -92,32 +92,32 @@ metrics = ComplexityMetrics(sql_parser, graph)
 top_complex = metrics.get_most_complex(5)
 ```
 
-## Validacao
+## Validação
 
 ### Model Validator
-Valida modelos contra boas praticas dbt.
+Valida modelos contra boas práticas dbt.
 
 ### Naming Validator
-Valida convencoes de nomenclatura (stg_, fct_, dim_).
+Valida convenções de nomenclatura (stg_, fct_, dim_).
 
 ### Config Validator
 Valida dbt_project.yml e configs de modelos.
 
-## Exportacao
+## Exportação
 
 ### JSON
-Exporta grafos e relatorios para JSON.
+Exporta grafos e relatórios para JSON.
 
 ### GraphViz DOT
-Gera diagramas de dependencia em formato DOT.
+Gera diagramas de dependência em formato DOT.
 
 ### Mermaid
-Gera diagramas Mermaid para documentacao.
+Gera diagramas Mermaid para documentação.
 
 ## Busca
 
 ### Busca Fuzzy
-Encontra modelos por nome com tolerancia a erros de digitacao.
+Encontra modelos por nome com tolerância a erros de digitação.
 
 ```python
 from dbt_parser.utils.search import FuzzySearch
@@ -127,4 +127,4 @@ results = search.search("stg_evnts")  # encontra stg_events
 ```
 
 ## Cache
-Cache em memoria para resultados de parsing com TTL configuravel.
+Cache em memória para resultados de parsing com TTL configurável.

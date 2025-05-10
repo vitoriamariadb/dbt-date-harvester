@@ -1,39 +1,39 @@
 # dbt-date-harvester
 
-Ferramenta de parsing e analise estatica para projetos dbt (data build tool).
+Ferramenta de parsing e análise estática para projetos dbt (data build tool).
 
 ## Sobre
 
 O dbt-date-harvester analisa projetos dbt extraindo metadados de arquivos YAML
-e SQL, construindo grafos de dependencia e fornecendo ferramentas completas de
-analise, validacao e exportacao.
+e SQL, construindo grafos de dependência e fornecendo ferramentas completas de
+análise, validação e exportação.
 
 ## Funcionalidades
 
 - Parsing de YAML (schema.yml, sources.yml, dbt_project.yml)
 - Parsing de SQL com suporte a Jinja (refs, sources, configs, CTEs)
-- Construcao de grafos de dependencia com networkx
+- Construção de grafos de dependência com networkx
 - Rastreamento de linhagem de dados
-- Analise de impacto de mudancas
-- Deteccao de modelos nao utilizados
-- Metricas de complexidade SQL
-- Deteccao de duplicados
-- Validacao de nomenclatura (stg_, fct_, dim_)
-- Validacao de configuracoes
-- Exportacao para JSON, GraphViz DOT e Mermaid
+- Análise de impacto de mudanças
+- Detecção de modelos não utilizados
+- Métricas de complexidade SQL
+- Detecção de duplicados
+- Validação de nomenclatura (stg_, fct_, dim_)
+- Validação de configurações
+- Exportação para JSON, GraphViz DOT e Mermaid
 - Busca fuzzy de modelos
-- Sistema de filtragem avancado
+- Sistema de filtragem avançado
 - Cache de resultados
-- Sistema de plugins extensivel
+- Sistema de plugins extensível
 - Interface CLI completa
 
-## Instalacao
+## Instalação
 
 ```bash
 pip install -e .
 ```
 
-### Dependencias
+### Dependências
 
 - Python 3.8+
 - pyyaml >= 6.0
@@ -54,19 +54,19 @@ make test
 # Parsing
 dbt-parser parse --project-dir /caminho/projeto
 
-# Grafo de dependencias
+# Grafo de dependências
 dbt-parser graph --project-dir /caminho/projeto
 
-# Analise de modelo especifico
+# Análise de modelo específico
 dbt-parser graph --project-dir /caminho/projeto --model fct_event_dates
 
-# Validacao
+# Validação
 dbt-parser validate --project-dir /caminho/projeto --severity warning
 
 # Linhagem de dados
 dbt-parser lineage --project-dir /caminho/projeto --model fct_event_dates
 
-# Exportacao
+# Exportação
 dbt-parser export --project-dir /caminho/projeto --format json --output graph.json
 dbt-parser export --project-dir /caminho/projeto --format dot --output graph.dot
 dbt-parser export --project-dir /caminho/projeto --format mermaid --output graph.mmd
@@ -104,13 +104,13 @@ exporter.export_to_file(
 dbt_parser/
   cli.py            - Interface de linha de comando
   parsers/          - Parsing de YAML, SQL e Jinja
-  analyzers/        - Grafos, linhagem, dependencias, impacto
-  validators/       - Validacao de modelos, nomes, configs
-  exporters/        - Exportacao JSON, GraphViz, Mermaid
+  analyzers/        - Grafos, linhagem, dependências, impacto
+  validators/       - Validação de modelos, nomes, configs
+  exporters/        - Exportação JSON, GraphViz, Mermaid
   utils/            - Cache, busca fuzzy, performance
-  plugins/          - Sistema de plugins extensivel
+  plugins/          - Sistema de plugins extensível
 tests/              - Suite completa de testes pytest
-docs/               - Documentacao detalhada
+docs/               - Documentação detalhada
 ```
 
 ## Testes
@@ -123,7 +123,7 @@ make test
 make test-cov
 ```
 
-## Documentacao
+## Documentação
 
 - [Arquitetura](docs/architecture.md)
 - [Features](docs/features.md)
@@ -131,6 +131,6 @@ make test-cov
 - [Tutorial](docs/tutorial.md)
 - [API Reference](docs/api_reference.md)
 
-## Licenca
+## Licença
 
 Uso interno.

@@ -1,55 +1,55 @@
 # Arquitetura - dbt-date-harvester
 
-## Visao Geral
+## Visão Geral
 
-O dbt-date-harvester e uma ferramenta de analise estatica para projetos dbt.
-Faz parsing de arquivos YAML e SQL, constroi grafos de dependencia e fornece
-ferramentas de validacao e analise.
+O dbt-date-harvester é uma ferramenta de análise estática para projetos dbt.
+Faz parsing de arquivos YAML e SQL, constrói grafos de dependência e fornece
+ferramentas de validação e análise.
 
 ## Componentes Principais
 
 ### Parsers
 
 - **YamlParser**: Parsing de arquivos YAML (schema.yml, sources.yml, dbt_project.yml)
-- **SqlParser**: Parsing de arquivos SQL com extracao de refs, sources e configs
-- **JinjaParser**: Analise de templates Jinja em SQL dbt
-- **MacroExpander**: Parsing e catalogo de macros Jinja
+- **SqlParser**: Parsing de arquivos SQL com extração de refs, sources e configs
+- **JinjaParser**: Análise de templates Jinja em SQL dbt
+- **MacroExpander**: Parsing e catálogo de macros Jinja
 - **SourceParser**: Parser especializado para sources dbt
-- **TestExtractor**: Extracao de testes schema e data tests
-- **SchemaExtractor**: Extracao estruturada de informacoes de schema.yml
+- **TestExtractor**: Extração de testes schema e data tests
+- **SchemaExtractor**: Extração estruturada de informações de schema.yml
 
 ### Analyzers
 
-- **GraphResolver**: Construcao e consulta de grafos de dependencia com networkx
+- **GraphResolver**: Construção e consulta de grafos de dependência com networkx
 - **LineageTracker**: Rastreamento de linhagem de dados
-- **DependencyAnalyzer**: Analise avancada de dependencias entre modelos
-- **RefResolver**: Resolucao de referencias ref() e source()
+- **DependencyAnalyzer**: Análise avançada de dependências entre modelos
+- **RefResolver**: Resolução de referências ref() e source()
 
 ### Validators
 
-- **ModelValidator**: Validacao de modelos contra boas praticas
+- **ModelValidator**: Validação de modelos contra boas práticas
 
 ## Fluxo de Dados
 
 ```
 Arquivos dbt -> Parsers -> Estruturas de Dados -> Analyzers -> Resultados
-                                                -> Validators -> Relatorios
+                                               -> Validators -> Relatórios
 ```
 
-## Dependencias Externas
+## Dependências Externas
 
 - **pyyaml**: Parsing de YAML
-- **networkx**: Grafos de dependencia
+- **networkx**: Grafos de dependência
 
-## Estrutura de Diretorios
+## Estrutura de Diretórios
 
 ```
 dbt_parser/
-  parsers/       - Modulos de parsing (YAML, SQL, Jinja)
-  analyzers/     - Modulos de analise (grafos, linhagem, dependencias)
-  validators/    - Modulos de validacao (modelos, nomes, configs)
-  exporters/     - Modulos de exportacao (JSON, GraphViz, Mermaid)
-  utils/         - Utilitarios (cache, busca)
+  parsers/       - Módulos de parsing (YAML, SQL, Jinja)
+  analyzers/     - Módulos de análise (grafos, linhagem, dependências)
+  validators/    - Módulos de validação (modelos, nomes, configs)
+  exporters/     - Módulos de exportação (JSON, GraphViz, Mermaid)
+  utils/         - Utilitários (cache, busca)
 tests/           - Suite de testes com pytest
-docs/            - Documentacao do projeto
+docs/            - Documentação do projeto
 ```
