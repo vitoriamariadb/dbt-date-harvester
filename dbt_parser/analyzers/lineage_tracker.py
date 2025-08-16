@@ -18,6 +18,19 @@ class LineageEntry:
     columns: list[str] = field(default_factory=list)
     transformation: str = ""
 
+
+@dataclass
+class ColumnLineageEntry:
+    """Rastreamento de linhagem em nivel de coluna."""
+
+    model: str
+    column: str
+    source_model: str
+    source_columns: list[str]
+    transformation_type: str = "direct"
+    expression: str = ""
+
+
 class LineageTracker:
     """Rastreia linhagem de dados atraves do projeto dbt."""
 
@@ -139,3 +152,84 @@ class LineageTracker:
             "source_entries": sum(1 for e in self._lineage_entries if e.lineage_type == "source"),
             "models_with_column_lineage": len(self._column_lineage),
         }
+
+    def track_column_transformation(
+        self,
+        model: str,
+        column: str,
+        source_model: str,
+        source_columns: list[str],
+        transformation_type: str = "direct",
+        expression: str = "",
+    ) -> None:
+        """Rastreia transformacao em nivel de coluna entre modelos."""
+        entry = ColumnLineageEntry(
+            model=model,
+            column=column,
+            source_model=source_model,
+            source_columns=source_columns,
+            transformation_type=transformation_type,
+            expression=expression,
+        )
+        key = f"{model}.{column}"
+        if key not in self._column_lineage:
+            self._column_lineage[key] = {"sources": [], "transformations": []}
+        self._column_lineage[key]["sources"].extend(
+            [f"{source_model}.{sc}" for sc in source_columns]
+        )
+        if transformation_type != "direct":
+            self._column_lineage[key]["transformations"].append(
+                {"type": transformation_type, "expression": expression}
+            )
+        logger.debug(
+            "Column lineage: %s.%s <- %s.%s (%s)",
+            model,
+            column,
+            source_model,
+            source_columns,
+            transformation_type,
+        )
+
+    def get_column_upstream(self, model: str, column: str) -> list[str]:
+        """Retorna todas as colunas upstream de uma coluna especifica."""
+        key = f"{model}.{column}"
+        entry = self._column_lineage.get(key, {})
+        sources = entry.get("sources", [])
+        all_upstream = list(sources)
+        for source_ref in sources:
+            parts = source_ref.split(".", 1)
+            if len(parts) == 2:
+                upstream = self.get_column_upstream(parts[0], parts[1])
+                all_upstream.extend(upstream)
+        return list(dict.fromkeys(all_upstream))
+
+    def get_column_downstream(self, model: str, column: str) -> list[str]:
+        """Retorna todas as colunas downstream de uma coluna especifica."""
+        source_ref = f"{model}.{column}"
+        downstream: list[str] = []
+        for key, entry in self._column_lineage.items():
+            if source_ref in entry.get("sources", []):
+                downstream.append(key)
+                parts = key.split(".", 1)
+                if len(parts) == 2:
+                    child_downstream = self.get_column_downstream(parts[0], parts[1])
+                    downstream.extend(child_downstream)
+        return list(dict.fromkeys(downstream))
+
+    def get_column_lineage_graph(self) -> dict[str, dict[str, Any]]:
+        """Retorna o grafo completo de linhagem em nivel de coluna."""
+        graph: dict[str, dict[str, Any]] = {}
+        for key, entry in self._column_lineage.items():
+            graph[key] = {
+                "upstream": entry.get("sources", []),
+                "transformations": entry.get("transformations", []),
+                "downstream": self.get_column_downstream(
+                    *key.split(".", 1)
+                )
+                if "." in key
+                else [],
+            }
+        return graph
+
+
+# "O impedimento a acao avanca a acao. O que esta no caminho se torna o caminho." -- Marco Aurelio
