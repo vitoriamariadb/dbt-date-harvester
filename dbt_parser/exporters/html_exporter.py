@@ -251,5 +251,4 @@ class HtmlExporter:
         logger.info("HTML exportado para: %s", filepath)
         return filepath
 
-
 # "A riqueza consiste muito mais no desfrute do que na posse." -- Aristoteles
