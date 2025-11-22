@@ -14,6 +14,7 @@ setup(
             "pytest>=7.0",
             "pytest-cov>=4.0",
             "pytest-mock>=3.10",
+            "hypothesis>=6.0",
             "mypy>=0.990",
             "flake8>=6.0",
             "black>=22.0",
