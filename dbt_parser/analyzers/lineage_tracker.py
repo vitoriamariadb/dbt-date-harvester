@@ -1,7 +1,7 @@
 """Rastreador de linhagem de dados para projetos dbt."""
 
-import logging
 from dataclasses import dataclass, field
+import logging
 from typing import Any
 
 from dbt_parser.analyzers.graph_resolver import GraphResolver, NodeInfo
