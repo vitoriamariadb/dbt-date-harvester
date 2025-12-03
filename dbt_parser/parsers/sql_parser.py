@@ -38,6 +38,7 @@ class SqlParser:
     )
 
     def __init__(self, project_dir: Path) -> None:
+        """Inicializa o parser com o diretorio do projeto dbt."""
         self.project_dir = project_dir
         self._parsed_models: dict[str, SqlModelInfo] = {}
 
