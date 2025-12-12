@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class HtmlExporter:
     """Exportador de grafos para HTML interativo com busca integrada."""
 
-    def __init__(self, graph) -> None:
+    def __init__(self, graph: Any) -> None:
         self._graph = graph
 
     def to_html(self, title: str = "dbt Dependency Graph") -> str:
