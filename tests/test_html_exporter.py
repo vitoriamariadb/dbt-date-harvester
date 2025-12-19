@@ -1,4 +1,5 @@
 """Testes para o modulo HtmlExporter."""
+
 import pytest
 
 try:
