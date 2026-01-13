@@ -3,6 +3,7 @@ Testes baseados em propriedades para os parsers SQL e YAML.
 Utiliza hypothesis para gerar inputs automaticamente e verificar
 invariantes dos parsers.
 """
+
 import pytest
 
 try:
