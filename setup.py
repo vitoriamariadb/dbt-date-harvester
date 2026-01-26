@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 
+
 setup(
     name="dbt-date-harvester",
     version="1.0.0",
