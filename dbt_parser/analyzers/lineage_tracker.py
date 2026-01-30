@@ -35,6 +35,7 @@ class LineageTracker:
     """Rastreia linhagem de dados atraves do projeto dbt."""
 
     def __init__(self, graph_resolver: GraphResolver) -> None:
+        """Inicializa o rastreador com o resolvedor de grafos."""
         self.graph_resolver = graph_resolver
         self._lineage_entries: list[LineageEntry] = []
         self._column_lineage: dict[str, dict[str, list[str]]] = {}
