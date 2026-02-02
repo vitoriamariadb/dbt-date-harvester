@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Parser para arquivos SQL de projetos dbt com suporte a Jinja."""
 
 import logging
